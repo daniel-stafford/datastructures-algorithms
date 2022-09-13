@@ -8,7 +8,7 @@ import UIKit
  For example:
  
  S = "00-44   48 5555 8361" should become
-     "004-448-555-583-61"
+ "004-448-555-583-61"
  
  Assume:
  - S consists only of digits (0-9), spaces, and/or dashses (-)
@@ -22,18 +22,51 @@ import UIKit
  - if the block ends in anything other than -xxx or -xx reformat to a block of two like xx-xx (not obvious)
  
  */
+
+
 func solution(_ S : String) -> String {
-    // do your work here
-    return ""
+    // remove dashes and space
+    var formattedString = S.replacingOccurrences(of: "-", with: "")
+    formattedString = formattedString.replacingOccurrences(of: " ", with: "")
+  
+    var result = ""
+
+    
+    // track index and value of each character
+    for (index, char) in formattedString.enumerated() { // O(n)
+        // first append the individual character to the result
+        result.append(char)
+        
+        let isEveryThirdCharacter = index + 1 >= 3 && (index + 1) % 3 == 0
+        let isNotLastCharacter = index + 1 != S.count
+        
+        if  isEveryThirdCharacter && isNotLastCharacter  {
+            result.append("-")
+        }
+    }
+   
+    var arr = Array(result) // O(n)
+    // if second to last char is -#
+    let secondLastCharIndex = arr.count - 2
+    if arr[secondLastCharIndex] == "-" {
+        // swap second to last and third to last chars - you can also use array.swap()
+        arr[secondLastCharIndex] = arr[secondLastCharIndex - 1]
+        arr[secondLastCharIndex - 1] = "-"
+    }
+    result = String(arr)
+    // reformat to ##-##
+    return result
 }
 
 solution("123456789")           // 123-456-789
 solution("555372654")           // 555-372-654
 solution("0 - 22 1985--324")    // 022-198-53-24
 
-// Edge cases
+// Edge cases1
 solution("01")                          // 01
 solution("012")                         // 012
 solution("0123")                        // 01-23
 solution("0123       444")              // 012-34-44
 solution("------0123       444")        // 012-34-44
+
+// Time complexity - O(5n)-ish thus O(n)
